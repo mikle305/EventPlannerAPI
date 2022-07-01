@@ -2,4 +2,6 @@
 /bin
 /obj
 /.idea
+/Migrations
 appsettings.json
+appsettings.Development.json
