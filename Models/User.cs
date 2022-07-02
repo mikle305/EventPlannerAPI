@@ -1,6 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-
-namespace EventPlannerAPI;
+﻿namespace EventPlannerAPI.Models;
 
 public class User
 {
@@ -13,4 +11,6 @@ public class User
     public string Email { get; set; }
 
     public string? TelegramId { get; set; }
+
+    public List<UserProject> UserProjects { get; set; }
 }
