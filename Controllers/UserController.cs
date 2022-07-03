@@ -28,6 +28,7 @@ public class UserController : ControllerBase
             return Ok(new
             {
                 Success = false,
+                Error = "Any data has already been taken by another user(s)",
                 IsEmailTaken = isEmailTaken,
                 IsNameTaken = isNameTaken
             });

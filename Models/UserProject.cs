@@ -6,19 +6,19 @@ public class UserProject
 
     public int UserId { get; set; }
 
-    public ProjectUserRole Role { get; set; }
+    public UserProjectRole Role { get; set; }
     
     public bool IsNotifiable { get; set; }
 
-    public Project Project { get; set; }
+    public virtual Project Project { get; set; }
     
-    public User User { get; set; }
+    public virtual User User { get; set; }
 }
 
-public enum ProjectUserRole
+public enum UserProjectRole
 {
-    Owner,
-    Administrator,
-    Writer,
-    Reader
+    Owner = 4,
+    Administrator = 3,
+    Writer = 2,
+    Reader = 1
 }

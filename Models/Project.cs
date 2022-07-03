@@ -10,5 +10,5 @@ public class Project
         
     public DateTime CreatedAt { get; set; }
 
-    public List<UserProject> UsersProject { get; set; }
+    public virtual List<UserProject> UsersProject { get; set; }
 }

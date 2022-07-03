@@ -12,5 +12,5 @@ public class User
 
     public string? TelegramId { get; set; }
 
-    public List<UserProject> UserProjects { get; set; }
+    public virtual List<UserProject> UserProjects { get; set; }
 }

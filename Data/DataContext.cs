@@ -19,6 +19,11 @@ public class DataContext: DbContext
         Database.EnsureCreated();
     }
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseLazyLoadingProxies();
+    }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<User>().HasIndex(user => new {user.Email, user.Username}).IsUnique();
