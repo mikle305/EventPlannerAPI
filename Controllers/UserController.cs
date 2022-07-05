@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EventPlannerAPI.Controllers;
 
 [ApiController]
-[Route("api/I[controller]")]
+[Route("api/[controller]")]
 public class UserController : ControllerBase
 {
     private readonly DataContext _db;
@@ -16,8 +16,8 @@ public class UserController : ControllerBase
         _db = db;
     }
     
-    [HttpPost("Register")]
-    public async Task<IActionResult> Register(string email, string username, string password)
+    [HttpPost("SetNewUser")]
+    public async Task<IActionResult> SetNewUser(string email, string username, string password)
     {
         List<User> users = await _db.Users.ToListAsync();
         bool isEmailTaken = users.FirstOrDefault(user => user.Email == email) != null;
@@ -48,8 +48,8 @@ public class UserController : ControllerBase
         });
     }
 
-    [HttpPost("Login")]
-    public async Task<IActionResult> Login(string email, string password)
+    [HttpPost("GetUserInfo")]
+    public async Task<IActionResult> GetUserInfo(string email, string password)
     {
         List<User> users = await _db.Users.ToListAsync();
         var user = users.FirstOrDefault(user => user.Email == email && user.Password == password);

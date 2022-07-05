@@ -1,5 +1,6 @@
 ﻿using EventPlannerAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Task = EventPlannerAPI.Models.Task;
 
 namespace EventPlannerAPI.Data;
 
@@ -11,7 +12,7 @@ public class DataContext: DbContext
     
     public DbSet<UserProject> UsersProjects { get; set; }
 
-    public DbSet<Event> Events { get; set; }
+    public DbSet<Task> Tasks { get; set; }
 
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
@@ -37,5 +38,9 @@ public class DataContext: DbContext
         builder.Entity<UserProject>()
             .HasOne(userProject => userProject.Project)
             .WithMany(project => project.UsersProject);
+        // One to many (Projects to Tasks)
+        builder.Entity<Task>()
+            .HasOne(t => t.Project)
+            .WithMany(p => p.Tasks);
     }
 }

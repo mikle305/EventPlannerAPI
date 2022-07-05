@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace EventPlannerAPI.Controllers;
 
 [ApiController]
-[Route("api/I[controller]")]
+[Route("api/[controller]")]
 public class ProjectController : Controller
 {
     private readonly DataContext _db;
@@ -16,8 +16,8 @@ public class ProjectController : Controller
         _db = db;
     }
     
-    [HttpPost("Create")]
-    public async Task<IActionResult> Create(int userId, string projectName)
+    [HttpPost("SetNewProject")]
+    public async Task<IActionResult> SetNewProject(int userId, string projectName)
     {
         var project = new Project()
         {
@@ -42,8 +42,8 @@ public class ProjectController : Controller
         });
     }
 
-    [HttpPost("SetRole")]
-    public async Task<IActionResult> SetRole(int roleAssignerId, int roleReceiverId, int projectId, UserProjectRole role)
+    [HttpPost("SetUserRole")]
+    public async Task<IActionResult> SetUserRole(int roleAssignerId, int roleReceiverId, int projectId, UserProjectRole role)
     {
         if (roleAssignerId == roleReceiverId)
         {
@@ -100,8 +100,8 @@ public class ProjectController : Controller
         });
     }
 
-    [HttpGet("GetAllByUser")]
-    public async Task<IActionResult> GetAllByUser(int userId)
+    [HttpGet("GetAllProjectsOfUser")]
+    public async Task<IActionResult> GetAllProjectsOfUser(int userId)
     {
         var relations = (await _db.UsersProjects.ToListAsync()).Where(r => r.UserId == userId);
         var projects = new List<ProjectInfo>();

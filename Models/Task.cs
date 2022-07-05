@@ -1,6 +1,6 @@
 ﻿namespace EventPlannerAPI.Models;
 
-public class Event
+public class Task
 {
     public int Id { get; set; }
         
@@ -14,19 +14,21 @@ public class Event
         
     public DateTime Deadline { get; set; }
 
-    public EventStatus Status { get; set; }
+    public TaskStatus Status { get; set; }
         
-    public EventIteration? IterationFrequency { get; set; }
+    public TaskIteration? IterationFrequency { get; set; }
+    
+    public virtual Project Project { get; set; }
 }
 
-public enum EventStatus
+public enum TaskStatus
 {
     Ended,
     Failed,
     InProcess
 }
 
-public enum EventIteration
+public enum TaskIteration
 {
      Daily,
      Weekly,

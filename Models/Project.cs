@@ -11,4 +11,6 @@ public class Project
     public DateTime CreatedAt { get; set; }
 
     public virtual List<UserProject> UsersProject { get; set; }
+    
+    public virtual List<Task> Tasks { get; set; }
 }
