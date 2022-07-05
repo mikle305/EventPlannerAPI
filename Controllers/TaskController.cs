@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Task = EventPlannerAPI.Models.Task;
-using Newtonsoft.Json;
 
 namespace EventPlannerAPI.Controllers;
 
