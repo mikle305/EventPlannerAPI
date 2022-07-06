@@ -19,9 +19,11 @@ public class TaskController : Controller
     }
     
     [HttpPost("SetNewTask")]
-    public async Task<IActionResult> SetNewTask(int projectId, string name, DateTime deadline)
+    public async Task<IActionResult> SetNewTask(
+        int projectId, string name, DateTime deadline, 
+        TaskType type = TaskType.Task, string? description = null)
     {
-        var task = new Task(name, projectId, deadline, DateTime.Now, TaskStatus.InProcess);
+        var task = new Task(name, projectId, description, deadline, DateTime.Now, type, TaskStatus.InProcess);
         await _db.Tasks.AddAsync(task);
         await _db.SaveChangesAsync();
         
@@ -34,8 +36,8 @@ public class TaskController : Controller
     
     [HttpPost("UpdateTask")]
     public async Task<IActionResult> UpdateTask(
-        int id, string name, string? description, TaskStatus status,
-        DateTime deadline, TaskIteration? iterationFrequency)
+        int id, string name, string? description, DateTime deadline, 
+        TaskType type, TaskStatus status, TaskIteration? iterationFrequency)
     {
         var task = (await _db.Tasks.ToListAsync()).FirstOrDefault(t => t.Id == id);
         if (task == null)
@@ -49,24 +51,26 @@ public class TaskController : Controller
 
         task.Name = name;
         task.Description = description;
-        task.Status = status;
         task.Deadline = deadline;
+        task.Type = type;
+        task.Status = status;
         task.IterationFrequency = iterationFrequency;
         await _db.SaveChangesAsync();
         
         return Ok(new
         {
             Success = true,
-            Task = new
+            Task = new TaskInfo
             {
-                task.Id,
-                task.ProjectId,
-                task.Name,
-                task.Description,
-                task.CreatedAt,
-                task.Deadline,
-                task.Status,
-                task.IterationFrequency
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                Name = task.Name,
+                Description = task.Description,
+                CreatedAt = task.CreatedAt,
+                DeadLine = task.Deadline,
+                Type = task.Type,
+                Status = task.Status,
+                IterationFrequency = task.IterationFrequency
             }
         });
     }
@@ -93,7 +97,7 @@ public class TaskController : Controller
                     IsToday = task.Deadline.Date == DateTime.Today,
                     Tasks = new List<TaskInfo>()
                 };
-            tasksByDay[task.Deadline.Day].Tasks.Add(new TaskInfo()
+            tasksByDay[task.Deadline.Day].Tasks.Add(new TaskInfo
             {
                 Id = task.Id,
                 ProjectId = task.ProjectId,
@@ -101,6 +105,7 @@ public class TaskController : Controller
                 Description = task.Description,
                 CreatedAt = task.CreatedAt,
                 DeadLine = task.Deadline,
+                Type = task.Type,
                 Status = task.Status,
                 IterationFrequency = task.IterationFrequency
             });
@@ -129,16 +134,17 @@ public class TaskController : Controller
         return Ok(new
         {
             Success = true,
-            Task = new
+            Task = new TaskInfo
             {
-                task.Id,
-                task.ProjectId,
-                task.Name,
-                task.Description,
-                task.CreatedAt,
-                task.Deadline,
-                task.Status,
-                task.IterationFrequency
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                Name = task.Name,
+                Description = task.Description,
+                CreatedAt = task.CreatedAt,
+                DeadLine = task.Deadline,
+                Type = task.Type,
+                Status = task.Status,
+                IterationFrequency = task.IterationFrequency
             }
         });
     }
@@ -186,6 +192,8 @@ public class TaskController : Controller
         public DateTime CreatedAt { get; set; }
 
         public DateTime DeadLine { get; set; }
+
+        public TaskType Type { get; set; }
         
         public TaskStatus Status { get; set; }
 
