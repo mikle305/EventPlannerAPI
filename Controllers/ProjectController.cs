@@ -2,6 +2,7 @@
 using EventPlannerAPI.Data;
 using EventPlannerAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using Task = System.Threading.Tasks.Task;
 
 namespace EventPlannerAPI.Controllers;
 
@@ -19,22 +20,14 @@ public class ProjectController : Controller
     [HttpPost("SetNewProject")]
     public async Task<IActionResult> SetNewProject(int userId, string projectName)
     {
-        var project = new Project()
-        {
-            Name = projectName,
-            CreatedAt = DateTime.Now
-        };
+        var project = new Project(projectName, DateTime.Now);
         await _db.Projects.AddAsync(project);
         await _db.SaveChangesAsync();
         await _db.UsersProjects.AddAsync(
-            new UserProject()
-            {
-                ProjectId = project.Id,
-                UserId = userId,
-                Role = UserProjectRole.Owner,
-                IsNotifiable = false,
-            });
+            new UserProject(project.Id, userId, UserProjectRole.Owner, false)
+            );
         await _db.SaveChangesAsync();
+        
         return Ok(new
         {
             Success = true,
@@ -100,6 +93,35 @@ public class ProjectController : Controller
         });
     }
 
+    [HttpPost("UpdateProject")]
+    public async Task<IActionResult> UpdateProject(int id, string name, string? description)
+    {
+        var project = (await _db.Projects.ToListAsync()).FirstOrDefault(p => p.Id == id);
+        if (project == null)
+        {
+            return Ok(new
+            {
+                Success = false,
+                Error = "This project id doesn't exist"
+            });
+        }
+
+        project.Name = name;
+        project.Description = description;
+        await _db.SaveChangesAsync();
+        return Ok(new
+        {
+            Success = true,
+            Project = new
+            {
+                project.Id,
+                project.Name,
+                project.Description,
+                project.CreatedAt
+            }
+        });
+    }
+
     [HttpGet("GetAllProjectsOfUser")]
     public async Task<IActionResult> GetAllProjectsOfUser(int userId)
     {
@@ -116,6 +138,7 @@ public class ProjectController : Controller
         }
         return Ok(new
         {
+            Success = true,
             Projects = projects
         });
     }

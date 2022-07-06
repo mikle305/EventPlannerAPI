@@ -13,6 +13,14 @@ public class UserProject
     public virtual Project Project { get; set; }
     
     public virtual User User { get; set; }
+
+    public UserProject(int projectId, int userId, UserProjectRole role, bool isNotifiable)
+    {
+        ProjectId = projectId;
+        UserId = userId;
+        Role = role;
+        IsNotifiable = isNotifiable;
+    }
 }
 
 public enum UserProjectRole
