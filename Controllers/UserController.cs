@@ -2,6 +2,7 @@
 using EventPlannerAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Task = EventPlannerAPI.Models.Task;
 
 namespace EventPlannerAPI.Controllers;
 
@@ -33,12 +34,8 @@ public class UserController : ControllerBase
                 IsNameTaken = isNameTaken
             });
         }
-        var user = new User()
-        {
-            Email = email,
-            Username = username,
-            Password = password
-        };
+
+        var user = new User(username, password, email);
         await _db.Users.AddAsync(user);
         await _db.SaveChangesAsync();
         return Ok(new
@@ -48,12 +45,44 @@ public class UserController : ControllerBase
         });
     }
 
-    [HttpPost("GetUserInfo")]
-    public async Task<IActionResult> GetUserInfo(string email, string password)
+    [HttpPost("UpdateUser")]
+    public async Task<IActionResult> UpdateUser(int id, string username, string password, string email, string? telegramId)
+    {
+        List<User> users = await _db.Users.ToListAsync();
+        var user = users.FirstOrDefault(user => user.Id == id);
+        if (user == null) 
+        {
+            return Ok(new
+            {
+                Success = false,
+                Error = "This user id doesn't exist"
+            });
+        }
+
+        user.Username = username;
+        user.Password = password;
+        user.Email = email;
+        user.TelegramId = telegramId;
+        await _db.SaveChangesAsync();
+        
+        return Ok(new
+        {
+            Success = true,
+            User = new
+            {
+                user.Id,
+                user.Username,
+                user.Email,
+                user.TelegramId
+            }
+        });
+    }
+
+    [HttpPost("GetUserByData")]
+    public async Task<IActionResult> GetUserByData(string email, string password)
     {
         List<User> users = await _db.Users.ToListAsync();
         var user = users.FirstOrDefault(user => user.Email == email && user.Password == password);
-        
         if (user == null) 
         {
             return Ok(new
@@ -62,11 +91,17 @@ public class UserController : ControllerBase
                 Error = "Invalid user data"
             });
         }
+        
         return Ok(new
         {
             Success = true, 
-            user.Id, 
-            user.Username
+            User = new
+            {
+                user.Id,
+                user.Username,
+                user.Email,
+                user.TelegramId
+            }
         });
     }
 }
