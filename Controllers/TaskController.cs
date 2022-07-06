@@ -91,9 +91,19 @@ public class TaskController : Controller
                 { 
                     Weekday = task.Deadline.DayOfWeek,
                     IsToday = task.Deadline.Date == DateTime.Today,
-                    Tasks = new List<Task>()
+                    Tasks = new List<TaskInfo>()
                 };
-            tasksByDay[task.Deadline.Day].Tasks.Add(task);
+            tasksByDay[task.Deadline.Day].Tasks.Add(new TaskInfo()
+            {
+                Id = task.Id,
+                ProjectId = task.ProjectId,
+                Name = task.Name,
+                Description = task.Description,
+                CreatedAt = task.CreatedAt,
+                DeadLine = task.Deadline,
+                Status = task.Status,
+                IterationFrequency = task.IterationFrequency
+            });
         }
         
         return Ok(new
@@ -103,8 +113,8 @@ public class TaskController : Controller
         });
     }
 
-    [HttpGet("GetTaskInfoById")]
-    public async Task<IActionResult> GetTaskInfoById(int id)
+    [HttpGet("GetTaskById")]
+    public async Task<IActionResult> GetTaskById(int id)
     {
         var task = (await _db.Tasks.ToListAsync()).FirstOrDefault(t => t.Id == id);
         if (task == null)
@@ -160,6 +170,25 @@ public class TaskController : Controller
 
         public bool IsToday { get; set; }
 
-        public List<Task> Tasks { get; set; }
+        public List<TaskInfo> Tasks { get; set; }
+    }
+    
+    private class TaskInfo
+    {
+        public int Id { get; set; }
+        
+        public int ProjectId { get; set; }
+
+        public string Name { get; set; }
+
+        public string? Description { get; set; }
+        
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime DeadLine { get; set; }
+        
+        public TaskStatus Status { get; set; }
+
+        public TaskIteration? IterationFrequency { get; set; }
     }
 }
