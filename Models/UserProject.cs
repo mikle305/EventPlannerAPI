@@ -17,8 +17,8 @@ public class UserProject
 
 public enum UserProjectRole
 {
-    Owner = 4,
-    Administrator = 3,
-    Writer = 2,
-    Reader = 1
+    Owner = 3,
+    Administrator = 2,
+    Writer = 1,
+    Reader = 0
 }

@@ -1,7 +1,9 @@
 ﻿using EventPlannerAPI.Data;
+using EventPlannerAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Task = EventPlannerAPI.Models.Task;
+using TaskStatus = EventPlannerAPI.Models.TaskStatus;
 
 namespace EventPlannerAPI.Controllers;
 
@@ -15,8 +17,49 @@ public class TaskController : Controller
     {
         _db = db;
     }
+    
+    [HttpPost("SetNewTask")]
+    public async Task<IActionResult> SetNewTask(int projectId, string name, DateTime deadline)
+    {
+        var task = new Task(name, projectId, deadline, DateTime.Now, TaskStatus.InProcess);
+        await _db.Tasks.AddAsync(task);
+        await _db.SaveChangesAsync();
+        return Ok(new
+        {
+            Success = true,
+            task.Id
+        });
+    }
+    
+    [HttpPost("UpdateTask")]
+    public async Task<IActionResult> UpdateTask(
+        int id, string name, string? description, TaskStatus status,
+        DateTime deadline, TaskIteration? iterationFrequency)
+    {
+        var task = (await _db.Tasks.ToListAsync()).FirstOrDefault(t => t.Id == id);
+        if (task == null)
+        {
+            return Ok(new 
+            {
+                Success = false,
+                Error = "This task id doesn't exist"
+            });
+        }
 
-    [HttpGet("GetAllTasksOfMonth")]
+        task.Name = name;
+        task.Description = description;
+        task.Status = status;
+        task.Deadline = deadline;
+        task.IterationFrequency = iterationFrequency;
+        await _db.SaveChangesAsync();
+        return Ok(new
+        {
+            Success = true,
+            Task = task
+        });
+    }
+
+    [HttpGet("GetAllTasksByMonth")]
     public async Task<IActionResult> GetAllTasksOfMonth(int userId, int projectId, int year, int month)
     {
         
@@ -36,6 +79,47 @@ public class TaskController : Controller
             tasksByDay[task.Deadline.Day].Tasks.Add(task);
         }
         return Ok(tasksByDay);
+    }
+
+    [HttpGet("GetTaskInfoById")]
+    public async Task<IActionResult> GetTaskInfoById(int id)
+    {
+        var task = (await _db.Tasks.ToListAsync()).FirstOrDefault(t => t.Id == id);
+        if (task == null)
+        {
+            return Ok(new 
+            {
+                Success = false,
+                Error = "This task id doesn't exist"
+            });
+        }
+
+        return Ok(new
+        {
+            Success = true,
+            Task = task
+        });
+    }
+
+    [HttpPost("DeleteTaskById")]
+    public async Task<IActionResult> DeleteTaskById(int id)
+    {
+        var task = (await _db.Tasks.ToListAsync()).FirstOrDefault(t => t.Id == id);
+        if (task == null)
+        {
+            return Ok(new 
+            {
+                Success = false,
+                Error = "This task id doesn't exist"
+            });
+        }
+        
+        _db.Tasks.Remove(task);
+        await _db.SaveChangesAsync();
+        return Ok(new
+        {
+            Success = true
+        });
     }
 
     private class TaskInfoByDay
