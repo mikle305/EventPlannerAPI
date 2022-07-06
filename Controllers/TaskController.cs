@@ -24,6 +24,7 @@ public class TaskController : Controller
         var task = new Task(name, projectId, deadline, DateTime.Now, TaskStatus.InProcess);
         await _db.Tasks.AddAsync(task);
         await _db.SaveChangesAsync();
+        
         return Ok(new
         {
             Success = true,
@@ -52,20 +53,36 @@ public class TaskController : Controller
         task.Deadline = deadline;
         task.IterationFrequency = iterationFrequency;
         await _db.SaveChangesAsync();
+        
         return Ok(new
         {
             Success = true,
-            Task = task
+            Task = new
+            {
+                task.Id,
+                task.ProjectId,
+                task.Name,
+                task.Description,
+                task.CreatedAt,
+                task.Deadline,
+                task.Status,
+                task.IterationFrequency
+            }
         });
     }
 
     [HttpGet("GetAllTasksByMonth")]
-    public async Task<IActionResult> GetAllTasksOfMonth(int userId, int projectId, int year, int month)
+    public async Task<IActionResult> GetAllTasksByMonth(int userId, int projectId, int year, int month)
     {
         
         var tasks = 
             (await _db.Tasks.ToListAsync())
-            .Where(t => t.Deadline.Year == year && t.Deadline.Month == month);
+            .Where(t =>
+                t.Project.UsersProject.FirstOrDefault(
+                    r => r.UserId == userId && r.ProjectId == projectId) 
+                != null &&
+                t.Deadline.Year == year && 
+                t.Deadline.Month == month);
         Dictionary<int, TaskInfoByDay> tasksByDay = new Dictionary<int, TaskInfoByDay>();
         foreach (var task in tasks)
         {
@@ -78,7 +95,12 @@ public class TaskController : Controller
                 };
             tasksByDay[task.Deadline.Day].Tasks.Add(task);
         }
-        return Ok(tasksByDay);
+        
+        return Ok(new
+        {
+            Success = true,
+            TasksOfMonth = tasksByDay
+        });
     }
 
     [HttpGet("GetTaskInfoById")]
@@ -97,7 +119,17 @@ public class TaskController : Controller
         return Ok(new
         {
             Success = true,
-            Task = task
+            Task = new
+            {
+                task.Id,
+                task.ProjectId,
+                task.Name,
+                task.Description,
+                task.CreatedAt,
+                task.Deadline,
+                task.Status,
+                task.IterationFrequency
+            }
         });
     }
 
