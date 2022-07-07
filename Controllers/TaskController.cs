@@ -21,7 +21,7 @@ public class TaskController : Controller
     [HttpPost("SetNewTask")]
     public async Task<IActionResult> SetNewTask(
         int projectId, string name, DateTime deadline, 
-        TaskType type = TaskType.Task, string? description = null)
+        TaskType type, string? description)
     {
         var task = new Task(name, projectId, description, deadline, DateTime.Now, type, TaskStatus.InProcess);
         await _db.Tasks.AddAsync(task);
