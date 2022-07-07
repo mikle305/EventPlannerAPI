@@ -22,12 +22,15 @@ public class Task
     
     public virtual Project Project { get; set; }
 
-    public Task(string name, int projectId, string? description, DateTime deadline, DateTime createdAt, TaskType type, TaskStatus status)
+    public Task(string name, int projectId, string? description, 
+        DateTime deadline, DateTime createdAt, TaskType type, TaskStatus status)
     {
         Deadline = deadline;
         CreatedAt = createdAt;
         Name = name;
         ProjectId = projectId;
+        Type = type;
+        Description = description;
         Status = status;
     }
 }
